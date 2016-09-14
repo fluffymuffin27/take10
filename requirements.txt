@@ -1,0 +1,3 @@
+###### Requirements with Version Specifiers ######
+sphinx ~= 1.4
+PyQt5  ~= 5.7
