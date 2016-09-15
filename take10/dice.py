@@ -17,9 +17,12 @@ def roll(num_dice: int, dice_type: int):
     :type num_dice: int.
     :param dice_type: how many sides each dice has
     :type dice_type: int.
-    :returns: iterator of dice values
+    :returns: iterator of dice values, or value if only 1 die specified
     :raises: ValueError
     """
     if num_dice < 0 or dice_type < 0:
         raise ValueError("Invalid values for dice_type/num_dice")
-    return (randint(1, dice_type) for _ in range(num_dice))
+    if num_dice == 1:
+        return randint(1, dice_type)
+    else:
+        return (randint(1, dice_type) for _ in range(num_dice))
