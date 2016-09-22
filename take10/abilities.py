@@ -9,27 +9,131 @@
 
 from enum import Enum, unique
 from abc import ABC, abstractmethod
-from collections import namedtuple
+
+from PyQt5.QtCore import QObject, Q_ENUMS, pyqtProperty, pyqtSignal
 
 from .dice import roll
 
 
-@unique
-class AbilityClass(Enum):
-    """Standard Pathfinder ability classes"""
-    STRENGTH = 0,
-    DEXTERITY = 1
-    INTELLIGENCE = 2
-    WISDOM = 3
-    CHARISMA = 4
-    CONSTITUTION = 5
+class AbilityScores(QObject):
+    """
+    AbilityScores are the core statistics for a character.
+    """
 
+    @unique
+    class AbilityClass(Enum):
+        """Standard Pathfinder ability classes"""
+        STRENGTH = 0
+        DEXTERITY = 1
+        INTELLIGENCE = 2
+        WISDOM = 3
+        CHARISMA = 4
+        CONSTITUTION = 5
 
-#: AbilityScores are named tuples containing the same fields as AbilityClass
-AbilityScores = namedtuple(
-    "AbilityScores",
-    [k for k in AbilityClass.__members__.keys()]
-)
+    Q_ENUMS(AbilityClass)
+
+    def __init__(
+        self,
+        STRENGTH: int,
+        DEXTERITY: int,
+        INTELLIGENCE: int,
+        WISDOM: int,
+        CHARISMA: int,
+        CONSTITUTION: int
+    ):
+        QObject.__init__(self)
+
+        self._strength = STRENGTH
+        self._dexterity = DEXTERITY
+        self._intelligence = INTELLIGENCE
+        self._wisdom = WISDOM
+        self._charisma = CHARISMA
+        self._constitution = CONSTITUTION
+
+    # Qt Signals for monitoring property changes
+    strength_changed = pyqtSignal(int)
+    dexterity_changed = pyqtSignal(int)
+    intelligence_changed = pyqtSignal(int)
+    wisdom_changed = pyqtSignal(int)
+    charisma_changed = pyqtSignal(int)
+    constitution_changed = pyqtSignal(int)
+
+    # Properties for gated acess to stat fields
+
+    @pyqtProperty(int, notify=strength_changed)
+    def strength(self):
+        return self._strength
+
+    @strength.setter
+    def strength(self, score: int):
+        if score < 0:
+            raise ValueError("AbilityScores cannot be negative")
+        self._strength = score
+
+    @pyqtProperty(int, notify=dexterity_changed)
+    def dexterity(self):
+        return self._dexterity
+
+    @dexterity.setter
+    def dexterity(self, score: int):
+        if score < 0:
+            raise ValueError("AbilityScores cannot be negative")
+        self._dexterity = score
+
+    @pyqtProperty(int, notify=intelligence_changed)
+    def intelligence(self):
+        return self._intelligence
+
+    @intelligence.setter
+    def intelligence(self, score: int):
+        if score < 0:
+            raise ValueError("AbilityScores cannot be negative")
+        self._intelligence = score
+
+    @pyqtProperty(int, notify=wisdom_changed)
+    def wisdom(self):
+        return self._wisdom
+
+    @wisdom.setter
+    def wisdom(self, score: int):
+        if score < 0:
+            raise ValueError("AbilityScores cannot be negative")
+        self._wisdom = score
+
+    @pyqtProperty(int, notify=charisma_changed)
+    def charisma(self):
+        return self._charisma
+
+    @charisma.setter
+    def charisma(self, score: int):
+        if score < 0:
+            raise ValueError("AbilityScores cannot be negative")
+        self._charisma = score
+
+    @pyqtProperty(int, notify=constitution_changed)
+    def constitution(self):
+        return self._constitution
+
+    @constitution.setter
+    def constitution(self, score: int):
+        if score < 0:
+            raise ValueError("AbilityScores cannot be negative")
+        self._constitution = score
+
+    @classmethod
+    def get_ability_class_names(cls):
+        return cls.AbilityClass.__members__.keys()
+
+    def scores_as_dict(self) -> dict:
+        """Returns the ability scores as a dict"""
+        return {
+            "STRENGTH": self._strength,
+            "DEXTERITY": self._dexterity,
+            "INTELLIGENCE": self._intelligence,
+            "WISDOM": self._wisdom,
+            "CHARISMA": self._charisma,
+            "CONSTITUTION": self._constitution,
+        }
 
 
 class AbilityScoreGenerator(ABC):
@@ -68,7 +172,7 @@ class StandardScoreGenerator(AbilityScoreGenerator):
         """
         return AbilityScores(**{
             ability: sum(sorted(roll(4, 6))[1:])
-            for ability in AbilityClass.__members__.keys()
+            for ability in AbilityScores.get_ability_class_names()
         })
 
 
@@ -96,7 +200,7 @@ class ClassicScoreGenerator(AbilityScoreGenerator):
         """
         return AbilityScores(**{
             ability: sum(roll(3, 6))
-            for ability in AbilityClass.__members__.keys()
+            for ability in AbilityScores.get_ability_class_names()
         })
 
 
@@ -120,5 +224,16 @@ class HeroicScoreGenerator(AbilityScoreGenerator):
         """
         return AbilityScores(**{
             ability: sum(roll(2, 6)) + 6
-            for ability in AbilityClass.__members__.keys()
+            for ability in AbilityScores.get_ability_class_names()
         })
+
+
+#: List of all score generator functions
+SCORE_GENERATORS = {
+    c.__name__: c.generate_scores
+    for c in [
+        StandardScoreGenerator,
+        HeroicScoreGenerator,
+        ClassicScoreGenerator,
+    ]
+}

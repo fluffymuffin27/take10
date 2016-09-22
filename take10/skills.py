@@ -16,6 +16,7 @@ from multi_key_dict import multi_key_dict
 from memoize import memoize
 
 
+# TODO: Consider making SkillClass a config file
 @unique
 class SkillClass(Enum):
     """
@@ -60,9 +61,10 @@ class SkillClass(Enum):
     USE_MAGIC_DEVICE = 34
 
 
+# TODO: Flesh SkillSet out into its own class
 SkillSet = namedtuple(
     "SkillSet",
-    [k for k in SkillClass.__members__.  keys()]
+    [k for k in SkillClass.__members__.keys()]
 )
 
 
