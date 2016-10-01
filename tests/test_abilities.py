@@ -33,6 +33,7 @@ class TestAbilities(unittest.TestCase):
         scores.intelligence = 0  # Should also be ok
         with self.assertRaises(ValueError):
             scores.charisma = -1
+            scores.deterity = 19
 
 
 if __name__ == "__main__":
