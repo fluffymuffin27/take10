@@ -19,6 +19,7 @@ class TestDice(unittest.TestCase):
         """Tests for single dice roll"""
         roll = dice.roll(1, 6)  # Emulates rolling 1d6
         self.assertLessEqual(roll, 6)
+        self.assertGreaterEqual(roll, 1)
 
     def test_roll_multidice(self):
         """Tests for multiple dice rolls"""
@@ -26,6 +27,7 @@ class TestDice(unittest.TestCase):
         self.assertIsNotNone(rolls)
         for roll in rolls:
             self.assertLessEqual(roll, 10)
+            self.assertGreaterEqual(roll, 1)
 
     def test_valid_values(self):
         """Tests for (in)valid dice values"""
